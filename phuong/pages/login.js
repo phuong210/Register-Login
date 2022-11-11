@@ -9,26 +9,38 @@ let formLogin = document.querySelector('form');
 let buttonLogin = document.querySelector('.btn-login');
 
 
+function isEmail(email) {
+    return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
+}
 
-function checkInputs() {
+function checkEmail(input) {
     let emailValue = email.value.trim();
-    let passwordValue = password.value.trim();
 
     if (emailValue === '') {
-        showError(email, 'Email cannot be blank')
+        showError(email, 'Field cannot be blank');
+        return false;
     }
     else if (!(isEmail(emailValue))) {
         showError(email, 'Not a valid email');
+        return false;
     }
     else {
         showSuccess(email);
+        return true;
     }
 
-    if (passwordValue === '') {
-        showError(password, 'Password cannot be blank');
+}
+
+function checkPasswordError(input, min, max) {
+    input.value = input.value.trim();
+
+    if (!input.value) {
+        showError(input, 'Field cannot be blank');
+        return false;
     }
     else {
-        showSuccess(password);
+        showSuccess(input);
+        return true;
     }
 }
 
@@ -48,9 +60,7 @@ function showSuccess(input) {
     small.innerText = '';
 
 }
-function isEmail(email) {
-    return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
-}
+
 
 // show hidden eye password
 const showHiddenPassword = () => {
@@ -71,42 +81,48 @@ showHiddenPassword();
 formLogin.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    checkInputs();
-    if (checkInputs() === false) {
-        checkInputs();
-    }
-    else {
-        buttonLogin.addEventListener('click', function () {
-            const object = {
-                email: email.value,
-                password: password.value,
-            };
-            login(object);
-        })
-        const login = async (values) => {
-            try {
-                buttonLogin.setAttribute('disabled', true)
-                buttonLogin.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Login...</span>`;
-                const resposne = await ApiHepler.post({ path: 'auth/login', payload: parseObjectToFormData(values) })
-                if (resposne.success === true) {
-                    buttonLogin.removeAttribute('disabled')
-                    buttonLogin.innerHTML = 'Sign in';
-
-                    $(myModalSuccess).modal('show');
-                    // alert('Dang Nhap Thanh Cong')
-                    ApiHepler.storeAccessToken(resposne.data.access_token);
-                    resetForm({ email, password })
-                    // window.location.href = '../public/index.html';
-                }
-            } catch (e) {
-                console.log(e);
-                $(myModalFail).modal('show');
-            }
-        }
-        const resetForm = (data) => {
-            data.email.value = '';
-            data.password.value = ''
-        }
-
+    let isCheckEmail = checkEmail(email);
+    let isCheckPass = checkPasswordError(password);
+    if (isCheckEmail && isCheckPass) {
+        console.log(1);
+        const object = {
+            email: email.value,
+            password: password.value,
+        };
+        console.log(object);
+        login(object);
     }
 });
+
+const login = async (values) => {
+    try {
+        buttonLogin.setAttribute('disabled', true)
+        buttonLogin.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Login...</span>`;
+        const resposne = await ApiHepler.post({ path: 'auth/login', payload: parseObjectToFormData(values) })
+        // console.log(resposne)
+        if (resposne.success === true) {
+            ApiHepler.setJwtToken(null);
+            buttonLogin.removeAttribute('disabled')
+            buttonLogin.innerHTML = 'Sign in';
+
+            // alert('Dang Nhap Thanh Cong')
+            ApiHepler.storeAccessToken(resposne.data.access_token);
+
+            $(myModalSuccess).modal('show');
+            $('#btnNextPage').click(function () {
+                window.location.href = '../public/index.html';
+            })
+            resetForm({ email, password })
+            // window.location.href = '../public/index.html';
+        }
+    } catch (e) {
+        buttonLogin.removeAttribute('disabled');
+        buttonLogin.innerHTML = 'Sign In';
+        $('#myModalFail').find('.modal-body').html(e.message);
+        $(myModalFail).modal('show');
+    }
+}
+const resetForm = (data) => {
+    data.email.value = '';
+    data.password.value = ''
+}
