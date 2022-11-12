@@ -120,6 +120,21 @@ form.sign-up-form {
   height: 37px;
   margin-bottom: 2rem;
 }
+.input-wrap.error .password{
+  position: inherit;
+  
+}
+.input-wrap.error:first-of-type small {
+  position: absolute;
+  bottom: -18px;
+}
+.input-wrap.error:last-of-type{
+  margin-bottom: 3.5rem;
+}
+.input-wrap.error:last-of-type small{
+  position: inherit;
+  bottom: 0;
+}
 
 .input-field {
   position: absolute;

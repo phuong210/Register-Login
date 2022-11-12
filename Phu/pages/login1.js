@@ -1,11 +1,14 @@
 import ApiHepler from "../services/services.js";
+import {
+    parseObjectToFormData
+} from '../utils/function.js'
 
 
-let name = document.querySelector('.name');
+
 let email = document.querySelector('.email');
 let password = document.querySelector('.password');
-let confirm_password = document.querySelector('.confirm__password')
-let button = document.querySelector('.register-submit');
+
+let button = document.querySelector('.sign-in-submit');
 let form = document.querySelector('form');
 let modal_success = document.querySelector('#modalSuccess');
 let modal_fail = document.querySelector('#modalFail');
@@ -14,7 +17,6 @@ let modal_fail = document.querySelector('#modalFail');
 // show hidden eye password
 const showHiddenPassword = () => {
     let togglePassword = document.querySelector("#togglePassword");
-    let toggleCfPassword = document.querySelector('#toggleCfPassword');
 
     togglePassword.addEventListener("click", function () {
         // toggle the type attribute
@@ -24,11 +26,7 @@ const showHiddenPassword = () => {
         // toggle the icon
         this.classList.toggle("bi-eye");
     });
-    toggleCfPassword.addEventListener("click", function () {
-        const type = confirm_password.getAttribute("type") === "password" ? "text" : "password";
-        confirm_password.setAttribute("type", type);
-        this.classList.toggle("bi-eye");
-    })
+
 }
 showHiddenPassword();
 
@@ -38,7 +36,7 @@ showHiddenPassword();
 
 
 
-export const showError = (input, message) => {
+function showError(input, message) {
     let parent = input.parentElement;
     let small = parent.querySelector('small');
 
@@ -47,7 +45,7 @@ export const showError = (input, message) => {
 
 }
 
-export const showSuccess = (input) => {
+function showSuccess(input) {
     let parent = input.parentElement;
     let small = parent.querySelector('small');
 
@@ -56,24 +54,6 @@ export const showSuccess = (input) => {
 
 }
 
-//  check name
-export const validateName = (input) => {
-    const nameValue = input.value.trim();
-    const regexName = /^([^0-9]*)$/;
-
-    if (!nameValue) {
-        showError(input, 'Field is not blank')
-        return false;
-    } else if (!regexName.test(nameValue)) {
-        showError(input, "Number is not allowed")
-        return false;
-
-    } else {
-        showSuccess(input);
-        return true;
-    }
-
-}
 
 const isValidEmail = (email) => {
     const regexEmail =
@@ -81,7 +61,6 @@ const isValidEmail = (email) => {
     return regexEmail.test(String(email).toLowerCase());
 
 };
-
 // check email 
 export const validateEmail = (input) => {
     const emailValue = input.value.trim();
@@ -97,7 +76,6 @@ export const validateEmail = (input) => {
         return true;
     }
 }
-
 
 // check password
 
@@ -133,99 +111,88 @@ export const validatePassword = (input) => {
 
 
 
-// check match password
-function checkMatchPasswordError(passwordInput, cfPasswordInput) {
-    if (passwordInput.value.trim() !== cfPasswordInput.value.trim()) {
-        showError(cfPasswordInput, 'Password does not match');
-        return false;
-    } else {
-        showSuccess(cfPasswordInput);
-        return true;
-    }
 
-}
+
+
+
+
 
 form.addEventListener('submit', function (e) {
     e.preventDefault();
-
-    let isMatchError = checkMatchPasswordError(password, confirm_password);
-    let checkName = validateName(name);
     let checkEmail = validateEmail(email);
     let checkPassword = validatePassword(password);
 
 
 
-    if (checkName && checkEmail && checkPassword && isMatchError) {
+    if (checkEmail && checkPassword) {
         console.log(1);
         const object = {
-            name: name.value,
+
             email: email.value,
             password: password.value,
-            confirm_password: confirm_password.value
+
 
         };
         console.log(object);
-        register(object);
-    } else {
-        // // logic, call api
-        // // bắt sự kiện click , lấy thông tin từ các field
-        // button.addEventListener('click', function () {
+        login(object);
 
-        // })
+    } else {
+        // const formData = new FormData(form);
+        // const data = Object.fromEntries(formData);
+        // console.log(data)
+        // logic, call api
+        // bắt sự kiện click , lấy thông tin từ các field
 
 
 
 
 
     }
-
-
-
-
-
-
 })
 
-const register = async (object) => {
+const login = async (object) => {
     try {
-        ApiHepler.setJwtToken(null);
+
+
         button.setAttribute('disabled', true);
         button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Sign Up..</span>`;
         const response = await ApiHepler.post({
-            path: 'auth/register',
-            payload: JSON.stringify(object)
+            path: 'auth/login',
+            payload: parseObjectToFormData(object)
         })
         console.log(response);
         if (response.success === true) {
+            ApiHepler.setJwtToken(null);
 
             button.removeAttribute('disabled')
-            button.innerHTML = 'Sign Up';
+            button.innerHTML = 'Sign In';
+            // lưu accesstoken vào localStorage 
+            ApiHepler.storeAccessToken(response.data.access_token);
             $(modal_success).modal('show');
-            $('#btnRedirect').click(function () {
+            $('#btnRedirect-dashboard').click(function () {
                 //handle redirect link
-                window.location.href = '../public/login1.html';
+                window.location.href = '../public/dashboard.html';
 
             })
             // setTimeout(() => {
-            //     window.location.href = '../public/login1.html';
-            // }, 3000);
+            //     window.location.href = '../public/index.html';
+            // }, 1000);
 
 
 
             resetForm({
                 email,
                 password,
-                name,
-                confirm_password
             });
 
         }
 
     } catch (e) {
         button.removeAttribute('disabled')
-        button.innerHTML = 'Sign Up';
-        console.log(e);
-        $('#modalFail').find('.modal-body').html(e.data.email[0]);
+        button.innerHTML = 'Sign In';
+        console.log(e)
+        $('#modalFail').find('.modal-body').html(e.message);
+        // console.log(err);
         $(modal_fail).modal('show');
 
 
@@ -237,7 +204,7 @@ const register = async (object) => {
 const resetForm = (data) => {
     data.email.value = '';
     data.password.value = '';
-    data.name.value = '';
-    data.confirm_password.value = '';
+
+
 
 }

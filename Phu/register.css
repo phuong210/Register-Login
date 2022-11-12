@@ -121,8 +121,12 @@ form.sign-up-form {
   margin-bottom: 2rem;
 }
 
+.input-wrap.error:nth-child(3){
+  margin-bottom: 3.5rem;
+}
+
 .input-field {
-  position: absolute;
+  /* position: absolute; */
   width: 100%;
   height: 100%;
   background: none;
@@ -404,8 +408,9 @@ main.sign-up-mode .carousel {
 }
 
 small{
-  position: absolute;
-  content: '';
+  /* position: absolute;
+  content: ''; */
   color: red;
   bottom: -18px;
+  /* white-space: nowrap; */
 }
