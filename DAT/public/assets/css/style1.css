@@ -1,0 +1,44 @@
+body {
+    min-height: 100vh;
+}
+
+.form-control:not(select) {
+    padding: 1.5rem 0.5rem;
+}
+
+select.form-control {
+    height: 52px;
+    padding-left: 0.5rem;
+}
+
+.form-control::placeholder {
+    color: #ccc;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+.form-control:focus {
+    box-shadow: none;
+}
+
+
+.input-group.success input  {
+    border-color: #09c372;
+}
+
+.input-group.error input , .input-group.success .input-group-prepend{
+    border-color: #ff3860;
+}
+
+.input-group .error {
+    color: #ff3860;
+    font-size: 9px;
+    height: 13px;
+    margin-top: 10px;
+}
+.toggle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 45px;
+    cursor: pointer;
+  }
