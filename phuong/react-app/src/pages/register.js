@@ -1,10 +1,8 @@
 import ApiHepler from '../services/services.js'
 import '../assets/css/register.scss';
-import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import Form from 'react-bootstrap/Form';
-// import InputComponent from "../components/input";
 import ButtonComponent from "../components/Button";
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -45,9 +43,7 @@ const Register = () => {
     const registerSubmit = async (object) => {
         try {
             ApiHepler.setJwtToken(null);
-
             const response = await ApiHepler.post({ path: 'auth/register', payload: JSON.stringify(object) })
-            // console.log(1);
             console.log(response);
             if (response.success === true) {
                 toast('success');
@@ -89,7 +85,6 @@ const Register = () => {
                             placeholder="Email"
                             value={formik.values.email}
                             onChange={formik.handleChange}
-                        // onChange={(e) => setEmail(e.target.value)}
                         />
                         {formik.errors.email && (
                             <p className='text-danger errorMsg'>{formik.errors.email}</p>
@@ -105,7 +100,6 @@ const Register = () => {
                             placeholder="Password"
                             value={formik.values.password}
                             onChange={formik.handleChange}
-                        // onChange={(e) => setPassword(e.target.value)}
                         />
                         {formik.errors.password && (
                             <p className='text-danger errorMsg'>{formik.errors.password}</p>
@@ -121,7 +115,6 @@ const Register = () => {
                             placeholder="Confirm Password"
                             value={formik.values.confirm_password}
                             onChange={formik.handleChange}
-                        // onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                         {formik.errors.confirm_password && (
                             <p className='text-danger errorMsg'>{formik.errors.confirm_password}</p>
