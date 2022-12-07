@@ -1,3 +1,4 @@
+
 const AuthLayout = ({ children }) => {
     return (
         <div className="Auth-layout">

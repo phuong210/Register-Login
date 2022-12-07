@@ -1,3 +1,5 @@
+import "./button.scss"
+
 const ButtonComponent = ({ className, name, type, isLink, url }) => {
     const renderButton = () => {
         if (isLink) {
