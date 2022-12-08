@@ -1,89 +1,54 @@
 import ApiHepler from '../../services/services.js'
 import './register.scss'
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useFormik } from 'formik';
 import InputComponent from '../../components/Input/Input.js';
 import ButtonComponent from "../../components/Button/Button.js"
 import Form from 'react-bootstrap/Form';
-import { validate } from '../../components/validate.js';
-import { ToastContainer, toast } from "react-toastify";
+import { validate } from '../../utils/function.js';
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify } from '../../components/toast.js';
+import LoadingComponent from '../../components/Loading/loading.js';
 
 
 const Register = () => {
 
-    const [formValues, setFormValues] = useState({ name: "", email: "", password: "", confirm_password: "" });
-    const [formErrors, setFormErrors] = useState({});
-    const [touched, setTouched] = useState({});
-
-    const handleChange = (e) => {
-        if (e.target.name === "IsAccepted") {
-            setFormValues({ ...formValues, [e.target.name]: e.target.checked });
-        } else {
-            setFormValues({ ...formValues, [e.target.name]: e.target.value });
+    const [loading, setLoading] = useState(false);
+    const formik = useFormik({
+        initialValues: {
+            name: "",
+            email: "",
+            password: "",
+            confirm_password: "",
+        },
+        validate,
+        onSubmit: (values, { resetForm }) => {
+            registerSubmit(values);
+            resetForm({ values: "" })
         }
-    };
-
-    const focusHandler = (event) => {
-        setTouched({ ...touched, [event.target.name]: true });
-    };
-
-    useEffect(() => {
-        setFormErrors(validate(formValues));
-    }, [formValues, touched]);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (Object.keys(formErrors).length) {
-            const object = {
-                name: formValues.name,
-                email: formValues.email,
-                password: formValues.password,
-                confirm_password: formValues.confirm_password
-            }
-            console.log(object);
-            registerSubmit(object);
-        }
-    };
+    });
 
     const registerSubmit = async (object) => {
         try {
-            document
-                .querySelector(".btn-submit")
-                .setAttribute("disabled", true);
-            document.querySelector(
-                ".btn-submit"
-            ).innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Sign Up..</span>`;
-
+            setLoading(true);
             ApiHepler.setJwtToken(null);
             const response = await ApiHepler.post({ path: 'auth/register', payload: JSON.stringify(object) })
-            console.log(response);
-
-            console.log(response);
             if (response.success === true) {
-                document
-                    .querySelector(".btn-submit")
-                    .removeAttribute("disabled");
-                document.querySelector(".btn-submit").innerHTML =
-                    "Sign Up";
+                setLoading(false);
                 notify("Sign Up Success", "success");
-
-
             }
         } catch (error) {
             notify("Account is registered", "warning");
-            document
-                .querySelector(".btn-submit")
-                .removeAttribute("disabled");
-            document.querySelector(".btn-submit").innerHTML =
-                "Sign Up";
+            setLoading(false);
+
         }
     };
 
     return (
         <div className="register d-flex align-items-center justify-content-center">
             <div className='container'>
-                <Form onSubmit={handleSubmit}>
+                <Form onSubmit={formik.handleSubmit} disabled={loading}>
                     <h1 className='mb-4'>Register</h1>
 
                     <InputComponent
@@ -91,22 +56,20 @@ const Register = () => {
                         id="name"
                         name="name"
                         placeholder="Username"
-                        value={formValues.name}
-                        onChange={handleChange}
-                        onFocus={focusHandler}
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
                     ></InputComponent>
-                    {formErrors.name && touched.name && <span className="text-danger">{formErrors.name}</span>}
+                    {formik.errors.name && <span className="text-danger">{formik.errors.name}</span>}
 
                     <InputComponent
                         type="text"
                         id="email"
                         name="email"
                         placeholder="Email"
-                        value={formValues.email}
-                        onChange={handleChange}
-                        onFocus={focusHandler}
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
                     ></InputComponent>
-                    {formErrors.email && touched.email && <span className="text-danger">{formErrors.email}</span>}
+                    {formik.errors.email && <span className="text-danger">{formik.errors.email}</span>}
 
                     <InputComponent
                         showHiddenPass={true}
@@ -114,11 +77,10 @@ const Register = () => {
                         id="password"
                         name="password"
                         placeholder="Password"
-                        value={formValues.password}
-                        onChange={handleChange}
-                        onFocus={focusHandler}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
                     ></InputComponent>
-                    {formErrors.password && touched.password && <span className="text-danger">{formErrors.password}</span>}
+                    {formik.errors.password && <span className="text-danger">{formik.errors.password}</span>}
 
                     <InputComponent
                         showHiddenPass={true}
@@ -126,14 +88,14 @@ const Register = () => {
                         id="confirm_password"
                         name="confirm_password"
                         placeholder="Confirm Password"
-                        value={formValues.confirm_password}
-                        onChange={handleChange}
-                        onFocus={focusHandler}
-
+                        value={formik.values.confirm_password}
+                        onChange={formik.handleChange}
                     ></InputComponent>
-                    {formErrors.confirm_password && touched.confirm_password && <span className="text-danger">{formErrors.confirm_password}</span>}
+                    {formik.errors.confirm_password && <span className="text-danger">{formik.errors.confirm_password}</span>}
 
-                    <ButtonComponent className={"mt-5 form-input btn-primary btn-submit"} name={"Sign Up"} type={"submit"} />
+                    <ButtonComponent className={"mt-5 form-input btn-primary btn-submit"} name={"Sign Up"} type={"submit"}>
+                        {loading ? <LoadingComponent /> : ""}
+                    </ButtonComponent>
 
                 </Form>
                 <ToastContainer />

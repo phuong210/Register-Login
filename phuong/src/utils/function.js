@@ -22,25 +22,50 @@ export const handleErrors = (response) => {
     if ([200, 201].includes(response.status)) {
         return response
     }
-    // if (response.status === 401) {
-    //     location.href = '/login'
-    // }
 
     throw response
 }
-export const useLoading = (status) => {
-    const loading = status;
-    async function withLoading(callback) {
-        loading = true;
-        try {
-            const response = await callback()
-            loading = false;
-            return response
-        } catch (error) {
-            loading = false;
-            throw error
-        }
+
+export const validate = ({ name, email, password, confirm_password }) => {
+    const errors = {};
+
+    if (!name.trim()) {
+        errors.name = "Username cannot be blank";
+    } else if (!/^([^0-9]*)$/.test(name)) {
+        errors.name = "Field must not contain numbers"
+    } else {
+        delete errors.name;
     }
-    return [loading, withLoading]
-}
-export default useLoading
+
+    if (!email) {
+        errors.email = "Email cannot be blank";
+    } else if (!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(String(email).toLowerCase())) {
+        errors.email = "Email address is invalid!";
+    } else {
+        delete errors.email;
+    }
+
+    if (!password) {
+        errors.password = "Password cannot be blank";
+    } else if (!/[A-Z]/.test(password)) {
+        errors.password = "Password should contains uppercase character";
+    } else if (!/[$@%^&*()}{[\]}!]/.test(password)) {
+        errors.password = "Password must contains at least 1 special character"
+    } else if (!/[0-9]/.test(password)) {
+        errors.password = "Password must contains at least 1 number character";
+    } else if (!(password.length >= 6)) {
+        errors.password = "Password needs to be 6 character or more";
+    } else {
+        delete errors.password;
+    }
+
+    if (!confirm_password) {
+        errors.confirm_password = "Confirm password cannot be blank";
+    } else if (!(confirm_password === password)) {
+        errors.confirm_password = "Password is not match!";
+    } else {
+        delete errors.confirm_password;
+    }
+
+    return errors;
+};
