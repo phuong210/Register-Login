@@ -1,0 +1,10 @@
+.Button-component{
+  outline: none;
+  border: none;
+  background-color: black;
+  color: white;
+  padding: 10px 15px;
+}
+.Button-component.btn-primary{
+  background-color: blue;
+}
