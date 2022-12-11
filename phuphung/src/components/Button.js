@@ -1,4 +1,12 @@
-const ButtonComponent = ({ className, name, type, isLink, url, children }) => {
+const ButtonComponent = ({
+    className,
+    name,
+    type,
+    isLink,
+    url,
+    children,
+    isLoading,
+}) => {
     const renderButton = () => {
         if (isLink) {
             return (
@@ -9,7 +17,19 @@ const ButtonComponent = ({ className, name, type, isLink, url, children }) => {
         } else {
             return (
                 <button type={type} className={`Button-component ${className}`}>
-                    {children}
+                    {isLoading ? (
+                        <>
+                            <span
+                                class='spinner-border spinner-border-sm'
+                                role='status'
+                                aria-hidden='true'
+                            ></span>
+                            <span class='visually-hidden'></span>
+                        </>
+                    ) : (
+                        ""
+                    )}
+
                     {name}
                 </button>
             );

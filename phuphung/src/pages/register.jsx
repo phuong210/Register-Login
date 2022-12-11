@@ -1,16 +1,17 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import ApiHepler from "../services/services.js";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useFormik } from "formik";
 import "../assets/css/register.css";
 import { validate } from "../utils/function.js";
 import { useState } from "react";
-import LoadingSpinner from "../components/Spinner.js";
 import ButtonComponent from "../components/Button.js";
 import InputComponents from "../components/Input.js";
+import { showToastMessage } from "../utils/function.js";
+import { ETypeStatus } from "../constants/constant.js";
+
 const Register = () => {
     const [loading, setLoading] = useState(false);
+    const [nameSignUp, setNameSignUp] = useState("Sign Up");
 
     const formik = useFormik({
         initialValues: {
@@ -20,11 +21,17 @@ const Register = () => {
             confirm_password: "",
         },
         validate,
-        onSubmit: (values, { resetForm }) => {
+        onSubmit: (values) => {
             registerCall(values);
-            resetForm({ values: "" });
         },
     });
+
+    const resetForms = () => {
+        formik.values.name = "";
+        formik.values.email = "";
+        formik.values.password = "";
+        formik.values.confirm_password = "";
+    };
 
     const handleFocus = (ev) => {
         ev.target.classList.add("active");
@@ -34,48 +41,26 @@ const Register = () => {
         ev.target.classList.remove("active");
     };
 
-    const notifySuccess = () => {
-        toast.success("register successfuly !", {
-            position: toast.POSITION.TOP_CENTER,
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            theme: "light",
-        });
-    };
-
-    const notifyFail = () => {
-        toast.error("register fail ! Please try again!", {
-            position: toast.POSITION.TOP_CENTER,
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            theme: "light",
-        });
-    };
-
     const registerCall = async (object) => {
         try {
             setLoading(true);
+            setNameSignUp("");
             ApiHepler.setJwtToken(null);
             const response = await ApiHepler.post({
                 path: "auth/register",
                 payload: JSON.stringify(object),
             });
-            console.log(response);
 
             if (response.success === true) {
                 setLoading(false);
-                notifySuccess();
+                setNameSignUp("Sign Up");
+                showToastMessage(ETypeStatus.SUCCESS);
+                resetForms();
             }
         } catch (e) {
-            console.log(e);
             setLoading(false);
-            notifyFail();
+            setNameSignUp("Sign Up");
+            showToastMessage(ETypeStatus.ERROR, e.data.email[0]);
         }
     };
 
@@ -170,17 +155,11 @@ const Register = () => {
                                 <ButtonComponent
                                     type={"submit"}
                                     className={"sign-btn register-submit"}
-                                    name={"Sign Up"}
+                                    name={nameSignUp}
+                                    isLoading={loading}
                                 >
-                                    {loading ? <LoadingSpinner /> : ""}
+                                    {/* {loading ? <LoadingSpinner /> : ""} */}
                                 </ButtonComponent>
-
-                                <ToastContainer />
-                                <p className='text'>
-                                    By signing up, I agree to the
-                                    {/* <a href=''>Terms of Services</a> and
-                                    <a href=''>Privacy Policy</a> */}
-                                </p>
                             </div>
                         </form>
                     </div>

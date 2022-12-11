@@ -1,7 +1,11 @@
-const AuthLayout = ({children}) => {
+import { ToastContainer } from "react-toastify";
+
+const AuthLayout = ({ children }) => {
     return (
-        <div className="Auth-layout">
+        <div className='Auth-layout'>
             {children}
-        </div>)
-}
+            <ToastContainer />
+        </div>
+    );
+};
 export default AuthLayout;

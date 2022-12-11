@@ -1,3 +1,6 @@
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export const parseObjectToFormData = (data) => {
     const formData = new FormData();
     Object.keys(data).forEach((key) => {
@@ -30,22 +33,22 @@ export const handleErrors = (response) => {
 
     throw response;
 };
-export const useLoading = (status) => {
-    const loading = status;
-    async function withLoading(callback) {
-        loading = true;
-        try {
-            const response = await callback();
-            loading = false;
-            return response;
-        } catch (error) {
-            loading = false;
-            throw error;
-        }
-    }
-    return [loading, withLoading];
-};
-export default useLoading;
+// export const useLoading = (status) => {
+//     const loading = status;
+//     async function withLoading(callback) {
+//         loading = true;
+//         try {
+//             const response = await callback();
+//             loading = false;
+//             return response;
+//         } catch (error) {
+//             loading = false;
+//             throw error;
+//         }
+//     }
+//     return [loading, withLoading];
+// };
+// export default useLoading;
 
 export const validate = ({ name, email, password, confirm_password }) => {
     const errors = {};
@@ -66,7 +69,7 @@ export const validate = ({ name, email, password, confirm_password }) => {
     } else if ({ password }.password.length > 16) {
         errors.password = " password only have maximum 16 characters";
     } else if (
-        !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/.test(
+        !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/.test(
             { password }.password
         )
     ) {
@@ -90,4 +93,28 @@ export const validate = ({ name, email, password, confirm_password }) => {
         errors.email = "Invalid email address";
     }
     return errors;
+};
+
+export const showToastMessage = (type, e) => {
+    if (type === "success") {
+        toast.success("register successfuly !", {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+        });
+    } else {
+        toast.error(`${e}`, {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+        });
+    }
 };
