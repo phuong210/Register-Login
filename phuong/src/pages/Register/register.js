@@ -6,15 +6,23 @@ import InputComponent from '../../components/Input/Input.js';
 import ButtonComponent from "../../components/Button/Button.js"
 import Form from 'react-bootstrap/Form';
 import { validate } from '../../utils/function.js';
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { notify } from '../../components/toast.js';
-import LoadingComponent from '../../components/Loading/loading.js';
+import { notify } from '../../utils/function.js';
+import { ETypeStatus } from '../../constants/constant.js';
 
+// import Link from "../../components/route/Link.js"
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
 
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    // const [flagChangePath, setFlagChangePath] = useState(true);
+    // const handlePathChange = () => {
+    //     setFlagChangePath(!flagChangePath);
+    // }
+
     const formik = useFormik({
         initialValues: {
             name: "",
@@ -23,11 +31,16 @@ const Register = () => {
             confirm_password: "",
         },
         validate,
-        onSubmit: (values, { resetForm }) => {
+        onSubmit: (values) => {
             registerSubmit(values);
-            resetForm({ values: "" })
         }
     });
+    const resetForms = () => {
+        formik.values.name = "";
+        formik.values.email = "";
+        formik.values.password = "";
+        formik.values.confirm_password = "";
+    };
 
     const registerSubmit = async (object) => {
         try {
@@ -36,12 +49,13 @@ const Register = () => {
             const response = await ApiHepler.post({ path: 'auth/register', payload: JSON.stringify(object) })
             if (response.success === true) {
                 setLoading(false);
-                notify("Sign Up Success", "success");
+                notify("Sign Up Success", ETypeStatus.SUCCESS);
+                resetForms();
+                navigate("/login");
             }
         } catch (error) {
-            notify("Account is registered", "warning");
+            notify(error.data.email[0], ETypeStatus.ERROR);
             setLoading(false);
-
         }
     };
 
@@ -50,6 +64,10 @@ const Register = () => {
             <div className='container'>
                 <Form onSubmit={formik.handleSubmit} disabled={loading}>
                     <h1 className='mb-4'>Register</h1>
+                    <p className='text-center'>Already have an account?
+                        {/* <Link to={"/login"} onHandleChangePath={handlePathChange}>Sign In</Link> */}
+                        <Link to="/login">Sign In</Link>
+                    </p>
 
                     <InputComponent
                         type="text"
@@ -93,12 +111,13 @@ const Register = () => {
                     ></InputComponent>
                     {formik.errors.confirm_password && <span className="text-danger">{formik.errors.confirm_password}</span>}
 
-                    <ButtonComponent className={"mt-5 form-input btn-primary btn-submit"} name={"Sign Up"} type={"submit"}>
-                        {loading ? <LoadingComponent /> : ""}
+                    <ButtonComponent className={"mt-5 form-input btn-primary btn-submit"} name={"Sign Up"} type={"submit"} isLoading={loading}>
+
                     </ButtonComponent>
+                    {/* <Link to={"/login"} onHandleChangePath={handlePathChange}>Sign In</Link> */}
+                    {/* <Link to="/login">Sign In</Link> */}
 
                 </Form>
-                <ToastContainer />
             </div>
         </div >)
 }

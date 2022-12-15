@@ -1,11 +1,28 @@
 import "./button.scss"
 
-const ButtonComponent = ({ className, name, type, isLink, url, children }) => {
+const ButtonComponent = ({ className, name, type, isLink, url, isLoading, children }) => {
     const renderButton = () => {
         if (isLink) {
-            return <a href={url} className={`Button-component ${className}`}>{name}</a>;
+            return <a href={url} className={`Button-component ${className}`}>
+                {name}
+            </a>;
         } else {
-            return <button type={type} className={`Button-component ${className}`} >{children}{name}</button>;
+            return (
+                <button type={type} className={`Button-component ${className} `} >
+                    {isLoading ? (
+                        <>
+                            <span
+                                class='spinner-border spinner-border-sm'
+                                role='status'
+                                aria-hidden='true'
+                            ></span>
+                            <span class='visually-hidden'></span>
+                        </>
+                    ) : ("")}
+                    {name}
+                    {children}
+                </button>
+            );
         }
     }
     return (
@@ -14,4 +31,5 @@ const ButtonComponent = ({ className, name, type, isLink, url, children }) => {
         </>
     );
 }
+
 export default ButtonComponent;
