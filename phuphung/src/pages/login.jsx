@@ -1,40 +1,31 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import { parseObjectToFormData, validate } from "../utils/function.js";
 import ApiHepler from "../services/services.js";
 import { useFormik } from "formik";
-import "../assets/css/register.css";
-import { validate } from "../utils/function.js";
 import { useState } from "react";
 import ButtonComponent from "../components/Button.js";
 import InputComponents from "../components/Input.js";
 import { showToastMessage } from "../utils/function.js";
 import { ETypeStatus } from "../constants/constant.js";
-import { useNavigate } from "react-router-dom";
+import "../assets/css/login.css";
 
-const Register = () => {
+const Login = () => {
     const [loading, setLoading] = useState(false);
-    const [nameSignUp, setNameSignUp] = useState("Sign Up");
-    const navigate = useNavigate();
+    const [nameLogin, setNameLogin] = useState("Log In");
 
     const formik = useFormik({
         initialValues: {
-            name: "",
             email: "",
             password: "",
-            confirm_password: "",
         },
         validate,
         onSubmit: (values) => {
-            console.log(1);
-
-            registerCall(values);
+            loginCall(values);
         },
     });
-
     const resetForms = () => {
-        formik.values.name = "";
         formik.values.email = "";
         formik.values.password = "";
-        formik.values.confirm_password = "";
     };
 
     const handleFocus = (ev) => {
@@ -45,70 +36,54 @@ const Register = () => {
         ev.target.classList.remove("active");
     };
 
-    const registerCall = async (object) => {
+    const loginCall = async (object) => {
         try {
             setLoading(true);
-            setNameSignUp("");
-            ApiHepler.setJwtToken(null);
+            setNameLogin("");
             const response = await ApiHepler.post({
-                path: "auth/register",
-                payload: JSON.stringify(object),
+                path: "auth/login",
+                payload: parseObjectToFormData(object),
             });
-            console.log(response);
 
             if (response.success === true) {
+                ApiHepler.setJwtToken(null);
                 setLoading(false);
-                setNameSignUp("Sign Up");
+
+                setNameLogin("Log In");
+                // ApiHepler.storeAccessToken(response.data.access_token);
+
                 showToastMessage(ETypeStatus.SUCCESS, response.message);
+
                 resetForms();
-                navigate("/login");
             }
         } catch (e) {
-            console.log(e);
             setLoading(false);
-            setNameSignUp("Sign Up");
-            showToastMessage(ETypeStatus.ERROR, e.data.email[0]);
+            setNameLogin("Log In");
+            showToastMessage(ETypeStatus.ERROR, e.message);
         }
     };
-
     return (
         <div className='d-flex justify-content-center'>
-            <div className='box register '>
+            <div className='box login'>
                 <div className='inner-box'>
                     <div className='forms-wrap'>
                         <form
                             onSubmit={formik.handleSubmit}
-                            className='sign-up-form'
+                            className='sign-in-form'
                             disabled={loading}
                         >
                             <div className='logo'>
-                                {/* <img src='../img/logo.png' alt='easyclass' /> */}
+                                <img src='../img/logo.png' alt='easyclass' />
                                 <h4>easyclass</h4>
                             </div>
                             <div className='heading'>
-                                <h2>Get Started</h2>
-                                <h6>Already have an account?</h6>
-                                <a href='./login.html' className='toggle'>
-                                    Sign in
+                                <h2>Welcome Back</h2>
+                                <h6>Not registred yet?</h6>
+                                <a href='./register.html' className='toggle'>
+                                    Sign up
                                 </a>
                             </div>
                             <div className='actual-form'>
-                                <InputComponents
-                                    name='name'
-                                    id='name'
-                                    type='text'
-                                    onFocus={handleFocus}
-                                    onBlur={handleBlur}
-                                    onChange={formik.handleChange}
-                                    value={formik.values.name}
-                                >
-                                    {formik.errors.name ? (
-                                        <small className='text-danger'>
-                                            {formik.errors.name}
-                                        </small>
-                                    ) : null}
-                                </InputComponents>
-
                                 <InputComponents
                                     name='email'
                                     id='email'
@@ -142,31 +117,19 @@ const Register = () => {
                                     ) : null}
                                 </InputComponents>
 
-                                <InputComponents
-                                    name='confirm_password'
-                                    id='confirm_password'
-                                    onFocus={handleFocus}
-                                    onBlur={handleBlur}
-                                    onChange={formik.handleChange}
-                                    value={formik.values.confirm_password}
-                                    ShowHidePassword='true'
-                                    placeholder='confirm password'
-                                >
-                                    {formik.errors.confirm_password ? (
-                                        <small className='text-danger'>
-                                            {formik.errors.confirm_password}
-                                        </small>
-                                    ) : null}
-                                </InputComponents>
-
                                 <ButtonComponent
                                     type={"submit"}
                                     className={"sign-btn register-submit"}
-                                    name={nameSignUp}
+                                    name={nameLogin}
                                     isLoading={loading}
                                 >
                                     {/* {loading ? <LoadingSpinner /> : ""} */}
                                 </ButtonComponent>
+                                <p className='text'>
+                                    Forgotten your password or you login
+                                    datails?
+                                    {/* <a href='#'>Get help</a> signing in */}
+                                </p>
                             </div>
                         </form>
                     </div>
@@ -209,4 +172,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default Login;

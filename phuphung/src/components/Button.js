@@ -20,11 +20,11 @@ const ButtonComponent = ({
                     {isLoading ? (
                         <>
                             <span
-                                class='spinner-border spinner-border-sm'
+                                className='spinner-border spinner-border-sm'
                                 role='status'
                                 aria-hidden='true'
                             ></span>
-                            <span class='visually-hidden'></span>
+                            <span className='visually-hidden'></span>
                         </>
                     ) : (
                         ""

@@ -97,7 +97,7 @@ export const validate = ({ name, email, password, confirm_password }) => {
 
 export const showToastMessage = (type, e) => {
     if (type === "success") {
-        toast.success("register successfuly !", {
+        toast.success(`${e}`, {
             position: toast.POSITION.TOP_CENTER,
             autoClose: 5000,
             hideProgressBar: false,

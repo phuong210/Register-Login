@@ -1,6 +1,9 @@
 import { BASE_URL } from "../constants/constant.js";
 import { objectToQueryString, handleErrors } from "../utils/function.js";
 
+const STORAGE_ACCESS_TOKEN = `token`;
+const setLocalStorage = (name, value) => localStorage.setItem(name, value);
+
 export default {
     token: undefined,
     headers: {},
