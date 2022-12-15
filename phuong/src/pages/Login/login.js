@@ -8,10 +8,10 @@ import Form from 'react-bootstrap/Form';
 import { parseObjectToFormData, validateLogin } from '../../utils/function.js';
 import { notify } from '../../utils/function.js';
 import { ETypeStatus } from '../../constants/constant.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const formik = useFormik({
         initialValues: {
@@ -32,19 +32,14 @@ const Login = () => {
     const loginSubmit = async (object) => {
         try {
             setLoading(true);
-            // console.log(2);
             const response = await ApiHepler.post({ path: 'auth/login', payload: parseObjectToFormData(object) })
-            console.log(response);
-
             if (response.success === true) {
                 ApiHepler.setJwtToken(null);
                 setLoading(false);
-
-                console.log(2);
-
+                ApiHepler.storeAccessToken(response.data.access_token);
                 notify("Sign In Success", ETypeStatus.SUCCESS);
                 resetForms();
-                // ApiHepler.storeAccessToken(response.data.access_token);
+                navigate('/dashboard')
             }
         } catch (error) {
             notify('Error', ETypeStatus.ERROR);

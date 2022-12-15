@@ -1,9 +1,13 @@
 import { BASE_URL } from '../constants/constant.js'
 import { objectToQueryString, handleErrors } from '../utils/function.js'
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
     token: undefined,
     headers: {},
+    storeAccessToken(token){
+       localStorage.setItem('token', token)
+    },
     setJwtToken(token) {
         this.token = token
         this.establishHeaderRequest()
