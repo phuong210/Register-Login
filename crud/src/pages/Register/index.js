@@ -4,12 +4,12 @@ import { useState } from "react";
 import ApiHelper from "../../services/service";
 import ClipLoader from "react-spinners/ClipLoader";
 import "./index.css";
-import { useFormik } from 'formik';
-import { validate } from "../../utils/function";
+
 import Form from "react-bootstrap/Form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ButtonComponent from "../../components/Button";
+import { useFormik } from 'formik';
 import * as Yup from "yup";
 const override = {
   display: "block",
@@ -19,36 +19,37 @@ const override = {
 const Register = () => {
   const [loaded, setLoaded] = useState(false);
   const formik = useFormik({
-    initialValues: {
-        name: "",
-        email: "",
-        password: "",
-        confirm_password: "",
-    },
-    validationSchema: Yup.object({
-      name: Yup.string()
-          .required("Please Enter a username")
-          .min(4, "Must be 4 characters or more"),
-      email: Yup.string()
-          .required("Please Enter your Email")
-          .matches(/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i, "Please enter a valid email"),
-      password: Yup.string()
-          .required('Please Enter your password')
-          .matches(
-              /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-              "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
-          ),
-      confirm_password: Yup.string()
-          .required("Required")
-          .oneOf([Yup.ref("password"), null], "Password must match "),
-  }),
-  onSubmit: (values, { resetForm }) => {
-      console.log(values);
-      register(values);
-      resetForm({ values: '' });
-  }
+      initialValues: {
+          name: "",
+          email: "",
+          password: "",
+          confirm_password: "",
+      },
+      validationSchema: Yup.object({
+        name: Yup.string()
+            .required("Please Enter a username")
+            .min(4, "Must be 4 characters or more"),
+        email: Yup.string()
+            .required("Please Enter your Email")
+            .matches(/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i, "Please enter a valid email"),
+        password: Yup.string()
+            .required('Please Enter your password')
+            .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+                "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+            ),
+        confirm_password: Yup.string()
+            .required("Required")
+            .oneOf([Yup.ref("password"), null], "Password must match "),
+    }),
+    onSubmit: (values, { resetForm }) => {
+        console.log(values);
+        register(values);
+        resetForm({ values: '' });
+    }
 
 });
+
   const showToastMessageError = (error) => {
     toast.error(error, {
       position: toast.POSITION.TOP_RIGHT,
