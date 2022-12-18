@@ -1,14 +1,15 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import ApiHepler from "../services/services.js";
+import ApiHepler from "services/services.js";
 import { useFormik } from "formik";
-import "../assets/css/register.css";
-import { validate } from "../utils/function.js";
+import "assets/css/register.css";
+import { validate } from "utils/function.js";
 import { useState } from "react";
-import ButtonComponent from "../components/Button.js";
-import InputComponents from "../components/Input.js";
-import { showToastMessage } from "../utils/function.js";
-import { ETypeStatus } from "../constants/constant.js";
+import ButtonComponent from "components/Button.js";
+import InputComponents from "components/Input.js";
+import { showToastMessage } from "utils/function.js";
+import { ETypeStatus } from "constants/constant.js";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Register = () => {
     const [loading, setLoading] = useState(false);
@@ -24,8 +25,6 @@ const Register = () => {
         },
         validate,
         onSubmit: (values) => {
-            console.log(1);
-
             registerCall(values);
         },
     });
@@ -41,6 +40,7 @@ const Register = () => {
         ev.target.classList.add("active");
     };
     const handleBlur = (ev) => {
+        formik.handleBlur(ev);
         if (ev.target.value !== "") return;
         ev.target.classList.remove("active");
     };
@@ -54,7 +54,6 @@ const Register = () => {
                 path: "auth/register",
                 payload: JSON.stringify(object),
             });
-            console.log(response);
 
             if (response.success === true) {
                 setLoading(false);
@@ -64,7 +63,6 @@ const Register = () => {
                 navigate("/login");
             }
         } catch (e) {
-            console.log(e);
             setLoading(false);
             setNameSignUp("Sign Up");
             showToastMessage(ETypeStatus.ERROR, e.data.email[0]);
@@ -88,9 +86,12 @@ const Register = () => {
                             <div className='heading'>
                                 <h2>Get Started</h2>
                                 <h6>Already have an account?</h6>
-                                <a href='./login.html' className='toggle'>
+                                {/* <a href='./login.html' className='toggle'>
                                     Sign in
-                                </a>
+                                </a> */}
+                                <Link to='/login' className='toggle'>
+                                    Log In
+                                </Link>
                             </div>
                             <div className='actual-form'>
                                 <InputComponents
@@ -102,7 +103,8 @@ const Register = () => {
                                     onChange={formik.handleChange}
                                     value={formik.values.name}
                                 >
-                                    {formik.errors.name ? (
+                                    {formik.touched.name &&
+                                    formik.errors.name ? (
                                         <small className='text-danger'>
                                             {formik.errors.name}
                                         </small>
@@ -118,7 +120,8 @@ const Register = () => {
                                     onChange={formik.handleChange}
                                     value={formik.values.email}
                                 >
-                                    {formik.errors.email ? (
+                                    {formik.touched.email &&
+                                    formik.errors.email ? (
                                         <small className='text-danger'>
                                             {formik.errors.email}
                                         </small>
@@ -135,7 +138,8 @@ const Register = () => {
                                     ShowHidePassword='true'
                                     placeholder='password'
                                 >
-                                    {formik.errors.password ? (
+                                    {formik.touched.password &&
+                                    formik.errors.password ? (
                                         <small className='text-danger'>
                                             {formik.errors.password}
                                         </small>
@@ -152,7 +156,8 @@ const Register = () => {
                                     ShowHidePassword='true'
                                     placeholder='confirm password'
                                 >
-                                    {formik.errors.confirm_password ? (
+                                    {formik.touched.confirm_password &&
+                                    formik.errors.confirm_password ? (
                                         <small className='text-danger'>
                                             {formik.errors.confirm_password}
                                         </small>

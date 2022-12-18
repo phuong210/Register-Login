@@ -1,13 +1,15 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { parseObjectToFormData, validate } from "../utils/function.js";
-import ApiHepler from "../services/services.js";
+import { parseObjectToFormData } from "utils/function.js";
+import ApiHepler from "services/services.js";
 import { useFormik } from "formik";
 import { useState } from "react";
-import ButtonComponent from "../components/Button.js";
-import InputComponents from "../components/Input.js";
-import { showToastMessage } from "../utils/function.js";
-import { ETypeStatus } from "../constants/constant.js";
-import "../assets/css/login.css";
+import ButtonComponent from "components/Button.js";
+import InputComponents from "components/Input.js";
+import { showToastMessage } from "utils/function.js";
+import { ETypeStatus } from "constants/constant.js";
+import "assets/css/login.css";
+import { Link } from "react-router-dom";
+import { validateLogin } from "utils/function.js";
 
 const Login = () => {
     const [loading, setLoading] = useState(false);
@@ -18,8 +20,9 @@ const Login = () => {
             email: "",
             password: "",
         },
-        validate,
+        validate: validateLogin,
         onSubmit: (values) => {
+            console.log(values);
             loginCall(values);
         },
     });
@@ -32,7 +35,10 @@ const Login = () => {
         ev.target.classList.add("active");
     };
     const handleBlur = (ev) => {
+        formik.handleBlur(ev);
+
         if (ev.target.value !== "") return;
+
         ev.target.classList.remove("active");
     };
 
@@ -43,23 +49,29 @@ const Login = () => {
             const response = await ApiHepler.post({
                 path: "auth/login",
                 payload: parseObjectToFormData(object),
+                // payload: JSON.stringify(object),
             });
+            console.log(response);
 
             if (response.success === true) {
                 ApiHepler.setJwtToken(null);
                 setLoading(false);
 
                 setNameLogin("Log In");
-                // ApiHepler.storeAccessToken(response.data.access_token);
+
+                ApiHepler.storeAccessToken(response.data.access_token);
 
                 showToastMessage(ETypeStatus.SUCCESS, response.message);
 
                 resetForms();
             }
         } catch (e) {
+            console.log(e, "bao loi ");
             setLoading(false);
             setNameLogin("Log In");
+            console.log("bao loi khi da chay xong spinner");
             showToastMessage(ETypeStatus.ERROR, e.message);
+            console.log("bao loi khi da hien thong bao bao loi");
         }
     };
     return (
@@ -79,9 +91,12 @@ const Login = () => {
                             <div className='heading'>
                                 <h2>Welcome Back</h2>
                                 <h6>Not registred yet?</h6>
-                                <a href='./register.html' className='toggle'>
+                                {/* <a href='./register.html' className='toggle'>
                                     Sign up
-                                </a>
+                                </a> */}
+                                <Link to='/register' className='toggle'>
+                                    Sign Up
+                                </Link>
                             </div>
                             <div className='actual-form'>
                                 <InputComponents
@@ -93,7 +108,8 @@ const Login = () => {
                                     onChange={formik.handleChange}
                                     value={formik.values.email}
                                 >
-                                    {formik.errors.email ? (
+                                    {formik.touched.email &&
+                                    formik.errors.email ? (
                                         <small className='text-danger'>
                                             {formik.errors.email}
                                         </small>
@@ -105,12 +121,14 @@ const Login = () => {
                                     id='password'
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
+                                    // onBlur={formik.handleBlur}
                                     onChange={formik.handleChange}
                                     value={formik.values.password}
                                     ShowHidePassword='true'
                                     placeholder='password'
                                 >
-                                    {formik.errors.password ? (
+                                    {formik.touched.password &&
+                                    formik.errors.password ? (
                                         <small className='text-danger'>
                                             {formik.errors.password}
                                         </small>

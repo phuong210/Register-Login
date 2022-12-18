@@ -50,48 +50,76 @@ export const handleErrors = (response) => {
 // };
 // export default useLoading;
 
-export const validate = ({ name, email, password, confirm_password }) => {
+export const validate = (values) => {
     const errors = {};
     // name
 
-    if (!{ name }.name) {
+    if (!values.name) {
         errors.name = "Required";
-    } else if (!/^([^0-9]*)$/.test({ name }.name)) {
+    } else if (!/^([^0-9]*)$/.test(values.name)) {
         errors.name = "Number is not allowed";
-    } else if ({ name }.name.length < 5) {
+    } else if (values.name.length < 5) {
         errors.name = "Must be 15 characters or less";
     }
     //password
-    if (!{ password }.password) {
+    if (!values.password) {
         errors.password = " Required";
-    } else if ({ password }.password.length < 8) {
+    } else if (values.password.length < 8) {
         errors.password = "password must have min 8 characters";
-    } else if ({ password }.password.length > 16) {
+    } else if (values.password.length > 16) {
         errors.password = " password only have maximum 16 characters";
     } else if (
         !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/.test(
-            { password }.password
+            values.password
         )
     ) {
         errors.password =
             "Must Contain 1 Uppercase, 1 Number and 1 Special Case Character";
     }
     // confirm_password
-    if (!{ confirm_password }.confirm_password) {
+    if (!values.confirm_password) {
         errors.confirm_password = "Required";
-    } else if (
-        { confirm_password }.confirm_password !== { password }.password
-    ) {
+    } else if (values.confirm_password !== values.password) {
         errors.confirm_password = " password does not match ";
     }
     // email
-    if (!{ email }.email) {
+    if (!values.email) {
         errors.email = "Required";
     } else if (
-        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test({ email }.email)
+        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
     ) {
         errors.email = "Invalid email address";
     }
+    return errors;
+};
+
+export const validateLogin = (values) => {
+    const errors = {};
+    // email
+    if (!values.email) {
+        errors.email = "Required";
+    } else if (
+        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+    ) {
+        errors.email = "Invalid email address";
+    }
+
+    //password
+    if (!values.password) {
+        errors.password = " Required";
+    } else if (values.password.length < 8) {
+        errors.password = "password must have min 8 characters";
+    } else if (values.password.length > 16) {
+        errors.password = " password only have maximum 16 characters";
+    } else if (
+        !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/.test(
+            values.password
+        )
+    ) {
+        errors.password =
+            "Must Contain 1 Uppercase, 1 Number and 1 Special Case Character";
+    }
+
     return errors;
 };
 
