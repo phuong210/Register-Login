@@ -26,6 +26,9 @@ let phoneUpdate = document.querySelector('#phoneUpdate');
 let avatarUpdate = document.querySelector('#avatar-update');
 let descUpdate = document.querySelector('#descUpdate');
 let inputAvatarUpdate = $('#input-update-avatar');
+let modal_success = document.querySelector('#modalSuccess');
+let modal_fail = document.querySelector('#modalFail');
+
 
 const logoutButton = document.querySelector('.logout-button');
 logoutButton.addEventListener('click', function () {
@@ -46,13 +49,16 @@ listTrigger.addEventListener('click', function (e) {
     for (const chart of Charts) {
         chart.classList.add('d-none');
     };
-    // // customerList.classList.remove('d-none');
+    customerList.classList.remove('d-none');
     getCustomerList(object);
 })
 
 // DELETE
 const deleteCustomer = async (id) => {
     try {
+
+        deleteConfirm.setAttribute('disabled', true);
+        deleteConfirm.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Deleting..</span>`;
         ApiHepler.setJwtToken(getToken);
         console.log(`id`, id);
         const response = await ApiHepler.get({
@@ -61,15 +67,29 @@ const deleteCustomer = async (id) => {
         });
         console.log("responseSaveCustomer", response);
         if (response.success === true) {
-            alert("xoa thanh cong")
+
+            deleteConfirm.removeAttribute('disabled')
+            deleteConfirm.innerHTML = 'Delete';
+
             getCustomerList();
             closeModal();
         }
     } catch (e) {
+        deleteConfirm.removeAttribute('disabled')
+        deleteConfirm.innerHTML = 'Delete';
         console.log(e);
     }
 };
 
+
+
+// LOADING MODAL
+const onLoadingModal = () => {
+    $('.modalLoading').modal('show');
+}
+const offLoadingModal = () => {
+    closeModal();
+}
 // UPDATE 
 const closeModal = () => {
     $('.modal').removeClass('in');
@@ -81,14 +101,23 @@ const closeModal = () => {
 
 // RENDER LIST
 const getCustomerList = async () => {
+
     try {
+
+        onLoadingModal();
+        console.log(1);
         ApiHepler.setJwtToken(getToken);
         const response = await ApiHepler.get({
             path: 'customer/list',
             params: objectToQueryString(object)
         })
 
+
         if (response.success === true) {
+            offLoadingModal();
+
+
+
             let tableData = "";
             response.data.result.map((values) => {
                 tableData += `
@@ -230,6 +259,8 @@ export const validateEmail = (input) => {
     }
 }
 
+
+
 // ADD 
 modalAdd.addEventListener('click', function (e) {
     e.preventDefault();
@@ -254,6 +285,8 @@ modalAdd.addEventListener('click', function (e) {
 })
 const addUser = async (object) => {
     try {
+        modalAdd.setAttribute('disabled', true);
+        modalAdd.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Saving..</span>`;
         ApiHepler.setJwtToken(getToken);
         const response = await ApiHepler.post({
             path: 'customer/save',
@@ -261,14 +294,44 @@ const addUser = async (object) => {
         })
         console.log(response);
         if (response.success === true) {
+            $(modal_success).modal('show');
+            modalAdd.removeAttribute('disabled')
+            modalAdd.innerHTML = 'Save';
             getCustomerList();
             // hide modal
-            closeModal();
+            // closeModal();
+            resetForm({
+                name,
+                email,
+                address,
+                desc,
+                phone,
+                image,
+
+            });
         }
     } catch (e) {
+        modalAdd.removeAttribute('disabled')
+        modalAdd.innerHTML = 'Save';
         console.log(e)
+        $('#modalFail').find('.modal-body').html(e.message);
+        // console.log(err);
+        $(modal_fail).modal('show');
     }
 }
+
+const resetForm = (data) => {
+    data.email.value = '';
+    data.name.value = '';
+    data.phone.value = '';
+    data.address.value = '';
+    data.image.value = '';
+    data.desc.value = '';
+
+
+
+}
+
 
 $(document).on("click", ".updateItem", function () {
     let id = this.getAttribute("data-id");
@@ -305,6 +368,9 @@ $(document).on("click", ".updateItem", function () {
 
 const updateCustomer = async (id) => {
     try {
+
+        updateConfirm.setAttribute('disabled', true);
+        updateConfirm.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Updating..</span>`;
         ApiHepler.setJwtToken(getToken);
         const response = await ApiHepler.post({
             path: `customer/update/${id}`,
@@ -319,12 +385,17 @@ const updateCustomer = async (id) => {
         })
         console.log(response);
         if (response.success === true) {
-            alert(' update thang cong');
+
+            updateConfirm.removeAttribute('disabled');
+            updateConfirm.innerHTML = 'Saving Changes';
+
             getCustomerList();
             // hide modal
             closeModal();
         }
     } catch (e) {
+        updateConfirm.removeAttribute('disabled');
+        updateConfirm.innerHTML = 'Saving Changes';
         console.log(e);
     }
 }
@@ -334,5 +405,16 @@ if (getToken) {
         page: BASE_URL1
     }, getToken);
 } else {
-    window.location.href = "../public/login1.html";
+    window.location.href = "../public/login.html";
 }
+
+
+window.addEventListener('DOMContentLoaded', event => {
+    // Simple-DataTables
+    // https://github.com/fiduswriter/Simple-DataTables/wiki
+
+    const datatablesSimple = document.getElementById('datatablesSimple');
+    if (datatablesSimple) {
+        new simpleDatatables.DataTable(datatablesSimple);
+    }
+});
