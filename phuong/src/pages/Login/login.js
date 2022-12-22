@@ -1,17 +1,16 @@
-import ApiHepler from '../../services/services.js'
+import ApiHepler from 'services/services.js'
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import './login.scss';
-import InputComponent from '../../components/Input/Input.js';
-import ButtonComponent from "../../components/Button/Button.js"
+import InputComponent from 'components/Input/Input.js';
+import ButtonComponent from "components/Button/Button.js"
 import Form from 'react-bootstrap/Form';
-import { parseObjectToFormData, validateLogin } from '../../utils/function.js';
-import { notify } from '../../utils/function.js';
-import { ETypeStatus } from '../../constants/constant.js';
-import { Link } from 'react-router-dom';
+import { parseObjectToFormData, validateLogin, notify } from 'utils/function.js';
+import { ETypeStatus } from 'constants/constant.js';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const formik = useFormik({
         initialValues: {
@@ -32,19 +31,14 @@ const Login = () => {
     const loginSubmit = async (object) => {
         try {
             setLoading(true);
-            // console.log(2);
             const response = await ApiHepler.post({ path: 'auth/login', payload: parseObjectToFormData(object) })
-            console.log(response);
-
             if (response.success === true) {
                 ApiHepler.setJwtToken(null);
                 setLoading(false);
-
-                console.log(2);
-
+                ApiHepler.storeAccessToken(response.data.access_token);
                 notify("Sign In Success", ETypeStatus.SUCCESS);
                 resetForms();
-                // ApiHepler.storeAccessToken(response.data.access_token);
+                navigate('/dashboard')
             }
         } catch (error) {
             notify('Error', ETypeStatus.ERROR);
@@ -58,7 +52,6 @@ const Login = () => {
                 <Form onSubmit={formik.handleSubmit} disabled={loading}>
                     <h1 className='mb-4'>Login</h1>
                     <p className='text-center'>Don't have an account?
-                        {/* <Link to={"/register"} onHandleChangePath={handlePathChange}>Sign Up</Link> */}
                         <Link to="/register">Sign Up</Link>
                     </p>
 
@@ -91,4 +84,3 @@ const Login = () => {
         </div >)
 }
 export default Login;
-

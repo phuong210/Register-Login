@@ -1,28 +1,18 @@
-import ApiHepler from '../../services/services.js'
+import ApiHepler from 'services/services.js'
 import './register.scss'
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import InputComponent from '../../components/Input/Input.js';
-import ButtonComponent from "../../components/Button/Button.js"
+import InputComponent from 'components/Input/Input.js';
+import ButtonComponent from "components/Button/Button.js"
 import Form from 'react-bootstrap/Form';
-import { validate } from '../../utils/function.js';
-import { notify } from '../../utils/function.js';
-import { ETypeStatus } from '../../constants/constant.js';
-
-// import Link from "../../components/route/Link.js"
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { validate, notify } from 'utils/function.js';
+import { ETypeStatus } from 'constants/constant.js';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
-    // const [flagChangePath, setFlagChangePath] = useState(true);
-    // const handlePathChange = () => {
-    //     setFlagChangePath(!flagChangePath);
-    // }
-
     const formik = useFormik({
         initialValues: {
             name: "",
@@ -65,7 +55,6 @@ const Register = () => {
                 <Form onSubmit={formik.handleSubmit} disabled={loading}>
                     <h1 className='mb-4'>Register</h1>
                     <p className='text-center'>Already have an account?
-                        {/* <Link to={"/login"} onHandleChangePath={handlePathChange}>Sign In</Link> */}
                         <Link to="/login">Sign In</Link>
                     </p>
 
@@ -111,15 +100,10 @@ const Register = () => {
                     ></InputComponent>
                     {formik.errors.confirm_password && <span className="text-danger">{formik.errors.confirm_password}</span>}
 
-                    <ButtonComponent className={"mt-5 form-input btn-primary btn-submit"} name={"Sign Up"} type={"submit"} isLoading={loading}>
-
-                    </ButtonComponent>
-                    {/* <Link to={"/login"} onHandleChangePath={handlePathChange}>Sign In</Link> */}
-                    {/* <Link to="/login">Sign In</Link> */}
+                    <ButtonComponent className={"mt-5 form-input btn-primary btn-submit"} name={"Sign Up"} type={"submit"} isLoading={loading}></ButtonComponent>
 
                 </Form>
             </div>
         </div >)
 }
 export default Register;
-
