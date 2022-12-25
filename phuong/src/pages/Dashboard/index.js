@@ -29,13 +29,7 @@ const Dashboard = () => {
 
     const handleClose = () => setShow(false);
 
-    const handleClickDeleteModal = (id) => {
-        let updateItem = user.find((item) => {
-            return item.id === id;
-        });
-        setForm(updateItem);
-        setShowDeleteModal(true);
-    }
+
 
     const handleCloseDelete = () => setShowDeleteModal(false);
 
@@ -77,7 +71,13 @@ const Dashboard = () => {
         setForm(updateItem);
         setShow(true);
     };
-
+    const handleClickDeleteModal = (id) => {
+        let findItem = user.find((item) => {
+            return item.id === id;
+        });
+        setForm(findItem);
+        setShowDeleteModal(true);
+    }
     const onSubmit = (userAdd) => {
         userAdd.id = user.length + 1;
         const newUsers = [...user, userAdd];
