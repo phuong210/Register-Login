@@ -18,9 +18,10 @@ const Dashboard = () => {
     return (
         <>
             <Button className='m-3' variant="info" onClick={() => setShowAdd(!showAdd)}>Add</Button>
-            {showAdd && (
+            {showAdd ? <FormComponent /> : ""}
+            {/* {showAdd && (
                 <FormComponent />
-            )}
+            )} */}
 
             <Table striped bordered hover>
                 <thead>

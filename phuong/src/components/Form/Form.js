@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 
 const FormComponent = () => {
     return (
-        <Form className='m-3'>
+        <Form className='m-3' >
             <Form.Group className="mb-3">
                 <Form.Label>UserName</Form.Label>
                 <Form.Control type="text" placeholder="User Name" />
