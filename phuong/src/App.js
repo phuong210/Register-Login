@@ -4,10 +4,9 @@ import Register from 'pages/Register/register.js';
 import Login from 'pages/Login/login.js';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from 'react';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Dashboard from 'pages/Dashboard';
-import { useEffect } from 'react';
-
 
 function App() {
     const navigate = useNavigate();

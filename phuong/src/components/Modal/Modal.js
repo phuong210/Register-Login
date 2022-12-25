@@ -2,7 +2,7 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-const ModalComponent = ({ show, handleClose, title, children, onFinished }) => {
+const ModalComponent = ({ show, colorBtn, nameBtn, handleClose, title, children, onFinished }) => {
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -17,8 +17,8 @@ const ModalComponent = ({ show, handleClose, title, children, onFinished }) => {
                 <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={onFinished}>
-                    Save Changes
+                <Button variant={colorBtn} onClick={onFinished}>
+                    {nameBtn}
                 </Button>
             </Modal.Footer>
         </Modal>
