@@ -1,5 +1,5 @@
 import Button from "react-bootstrap/Button";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Table from "react-bootstrap/Table";
 import ItemTable from "./table/ItemTable";
 import FormComponent from "components/Form/Form";
@@ -7,22 +7,43 @@ import ModalComponent from "components/Modal/Modal";
 import { notify } from "utils/function";
 import { ETypeStatus } from "constants/constant";
 import Form from "react-bootstrap/Form";
-
+import ApiHelper from 'services/services';
 const Dashboard = () => {
-  const [user, setUser] = useState([
-    { id: 1, name: "Mark", fullName: "Otto" },
-    { id: 2, name: "Mark", fullName: "Otto" },
-    { id: 3, name: "Mark", fullName: "Otto" },
-  ]);
+  const [user, setUser] = useState([]);
 
   const [showAdd, setShowAdd] = useState(false);
-
+  const getToken = localStorage.getItem("token");
   const [form, setForm] = useState({
-    id:1,
-    name: "",
-    fullName: "",
+    name : "",
+    email:"",
+    address:"",
+    description: "",
+    tel:"",
+    avatar: ""
   });
+  useEffect(()=>{
+    getUser();
+    
+  },[])
 
+  const body = {
+    page: 1,
+  };
+  const getUser = async ()=>{
+    try {
+      ApiHelper.setJwtToken(getToken);
+      const resposne = await ApiHelper.get({
+        path: "customer/list",
+        params: body,
+      });
+  
+      if (resposne.success === true) {
+        setUser(resposne.data.result);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
   const [show, setShow] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -48,25 +69,56 @@ const Dashboard = () => {
       [name]: value,
     });
   };
+  const updateCustomer = async (id ) => {
+    try {
+      ApiHelper.setJwtToken(getToken);
+     
+      const response = await ApiHelper.post({
+        path: `customer/update/${id}`,
+        payload: JSON.stringify({
+         name: form.name,
+         email:form.email,
+         address:form.address,
+         description:form.description,
+         avatar:form.avatar
+        }),
+      });
+
+      if (response.success === true) {
+        alert("update thanh cong")
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
   const onFinished = () => {
     const { id } = form;
-    setUser((prev)=> prev.map((item)=>{
-      if(item.id === id){
-        return form;
-      }
-      return {...item};
-    }))
 
+    updateCustomer(id,form)
     handleClose();
     notify("Update Success", ETypeStatus.SUCCESS);
   };
 
   const onFinishedDelete = () => {
     const { id } = form;
-    const removeItem = user.filter((item) => {
-      return item.id !== id;
-    });
-    setUser(removeItem);
+    console.log("id update",id);
+    const deleteCustomer = async (id) => {
+      try {
+        ApiHelper.setJwtToken(getToken);
+        console.log(`id`, id);
+        const response = await ApiHelper.get({
+          path: `customer/delete/${id}`,
+          params: {},
+        });
+        console.log("responseSaveCustomer", response);
+        if (response.success === true) {
+          alert("deleteSuccess")
+        }
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    setUser(deleteCustomer(id));
     handleCloseDelete();
 
     notify("Delete Success", ETypeStatus.SUCCESS);
@@ -78,10 +130,22 @@ const Dashboard = () => {
     setForm(updateItem);
     setShow(true);
   };
-  const onSubmit = (userAdd) => {
-    userAdd.id = user.length + 1;
-    const newUser = [...user, userAdd];
-    setUser(newUser);
+ 
+  const onSubmit = async (userAdd) => {
+    try {
+      ApiHelper.setJwtToken(getToken);
+      const response = await ApiHelper.post({
+        path: "customer/save",
+        payload: JSON.stringify(userAdd),
+      });
+      console.log("responseSaveCustomer", response);
+      if (response.success === true) {
+      setUser(user)
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+   
   };
   return (
     <>
@@ -97,9 +161,11 @@ const Dashboard = () => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>User Name</th>
-            <th>Full Name</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Tel</th>
+            <th>Address</th>
+            <th>Description</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -118,7 +184,7 @@ const Dashboard = () => {
           onFinished={onFinished}
         >
           <Form.Group className="mb-3">
-            <Form.Label>User Name</Form.Label>
+            <Form.Label> Name</Form.Label>
             <Form.Control
               type="text"
               placeholder="Enter user name"
@@ -129,12 +195,45 @@ const Dashboard = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Full Name</Form.Label>
+            <Form.Label>Email</Form.Label>
             <Form.Control
               type="text"
               placeholder="Enter full name"
-              name="fullName"
-              value={form.fullName}
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          
+          <Form.Group className="mb-3">
+            <Form.Label>Address</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter full name"
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          
+          <Form.Group className="mb-3">
+            <Form.Label>Tel</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter full name"
+              name="tel"
+              value={form.tel}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          
+          <Form.Group className="mb-3">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter full name"
+              name="description"
+              value={form.description}
               onChange={handleChange}
             />
           </Form.Group>

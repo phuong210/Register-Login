@@ -6,9 +6,11 @@ const ItemTable = ({ user, handleClickEditModal, handleClickDeleteModal }) => {
       {user.length > 0 &&
         user.map((item, key) => (
           <tr key={key}>
-            <td>{item.id}</td>
             <td>{item.name}</td>
-            <td>{item.fullName}</td>
+            <td>{item.email}</td>
+            <td>{item.tel}</td>
+            <td>{item.address}</td>
+            <td>{item.description}</td>
             <td>
               <Button
                 variant={"success"}
