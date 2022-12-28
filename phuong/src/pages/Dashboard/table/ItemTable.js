@@ -7,7 +7,11 @@ const ItemTable = ({ user, handleClickEditModal, handleClickDeleteModal }) => {
                 <tr key={key}>
                     <td>{item.id}</td>
                     <td>{item.name}</td>
-                    <td>{item.fullName}</td>
+                    <td>{item.email}</td>
+                    <td>{item.tel}</td>
+                    <td>{item.address}</td>
+                    <td><img src={item.avatar} /></td>
+                    <td>{item.description}</td>
                     <td>
                         <Button variant={"success"} onClick={() => handleClickEditModal(item.id)}>Edit</Button>
                         <Button variant={"danger"} onClick={() => handleClickDeleteModal(item.id)}>Delete</Button>

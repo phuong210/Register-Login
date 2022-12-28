@@ -100,6 +100,39 @@ export const validateLogin = (values) => {
     return errors;
 };
 
+export const validateForm = ({ form }) => {
+    const { name, email, tel, address, avatar, description } = form;
+    const errors = [];
+
+    if (!name.trim()) {
+        errors.name = "Name cannot be blank";
+    }
+    if (!email) {
+        errors.email = "Email cannot be blank";
+    } else if (!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(String(email).toLowerCase())) {
+        errors.email = "Email address is invalid!";
+    }
+    if (!tel) {
+        errors.tel = "Telephone cannot be blank";
+    }
+
+    if (!address) {
+        errors.address = "Address cannot be blank";
+    }
+
+    if (!avatar) {
+        errors.avatar = "Avatar cannot be blank";
+    }
+    if (!description) {
+        errors.description = "Description cannot be blank";
+        errors.push("Field");
+    }
+
+    return errors;
+}
+
+
+
 export const notify = (text, type) => {
     if (type === "success") {
         toast.success(text, {

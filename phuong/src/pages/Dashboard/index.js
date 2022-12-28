@@ -1,5 +1,7 @@
+import ApiHepler from 'services/services.js';
+import { objectToQueryString } from 'utils/function';
 import Button from 'react-bootstrap/Button';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import ItemTable from './table/ItemTable';
 import FormComponent from 'components/Form/Form';
@@ -10,26 +12,98 @@ import { ETypeStatus } from 'constants/constant';
 
 const Dashboard = () => {
 
-    const [user, setUser] = useState([
-        { id: 1, name: 'Mark', fullName: 'Otto' },
-        { id: 2, name: 'Jonh', fullName: 'Otto' },
-        { id: 3, name: 'Ali', fullName: 'Otto' },
+    let getToken = localStorage.getItem("token");
+    const body = {
+        page: 1
+    }
 
-    ])
+    const [user, setUser] = useState([])
+
+    useEffect(() => {
+        getCustomerList();
+    }, []);
+
+
+    const getCustomerList = async () => {
+        try {
+            ApiHepler.setJwtToken(getToken);
+            const response = await ApiHepler.get({
+                path: 'customer/list',
+                params: objectToQueryString(body)
+            })
+            if (response.success === true) {
+                setUser(response.data.result);
+            }
+        } catch (e) {
+            notify('Error', ETypeStatus.ERROR);
+        }
+    }
+
+    const addUser = async (values) => {
+        try {
+            ApiHepler.setJwtToken(getToken);
+            const response = await ApiHepler.post({ path: 'customer/save', payload: JSON.stringify(values) });
+            if (response.success === true) {
+                getCustomerList();
+                notify("Add Success", ETypeStatus.SUCCESS);
+            }
+
+        } catch (e) {
+            notify(e.data.email[0], ETypeStatus.ERROR);
+        }
+    }
+    const deleteUser = async (id) => {
+        try {
+            ApiHepler.setJwtToken(getToken);
+            const response = await ApiHepler.get({
+                path: `customer/delete/${id}`,
+                params: {}
+            });
+            if (response.success === true) {
+                getCustomerList();
+            }
+
+        } catch (e) {
+            notify('Error', ETypeStatus.ERROR);
+        }
+    }
+
+    const updateUser = async (id) => {
+        try {
+            ApiHepler.setJwtToken(getToken);
+            const response = await ApiHepler.post({
+                path: `customer/update/${id}`,
+                payload: JSON.stringify({
+                    name: form.name,
+                    email: form.email,
+                    description: form.description,
+                    address: form.address,
+                    tel: form.tel,
+                })
+            });
+            if (response.success === true) {
+                getCustomerList();
+            }
+        } catch (e) {
+            notify('Error', ETypeStatus.ERROR);
+        }
+    }
 
     const [showAdd, setShowAdd] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
-        fullName: ""
+        email: "",
+        tel: "",
+        address: "",
+        avatar: "",
+        description: ""
     });
 
     const [show, setShow] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const handleClose = () => setShow(false);
-
-
 
     const handleCloseDelete = () => setShowDeleteModal(false);
 
@@ -42,34 +116,24 @@ const Dashboard = () => {
             [name]: value
         })
     }
-
     const onFinished = () => {
         const { id } = form;
-        setUser((prev) => prev.map((item) => {
-            if (item.id === id) {
-                return form;
-            }
-            return { ...item };
-        }))
+        updateUser(id);
         handleClose();
         notify("Update Success", ETypeStatus.SUCCESS);
     }
-    const onFinishedDelete = () => {
-        const { id } = form;
-        const removeItem = user.filter((item) => {
-            return item.id !== id;
-        });
-        setUser(removeItem);
-        handleCloseDelete();
-        notify("Delete Success", ETypeStatus.SUCCESS);
-    };
-
     const handleClickEditModal = (id) => {
         let updateItem = user.find((item) => {
             return item.id === id;
         });
         setForm(updateItem);
         setShow(true);
+    };
+    const onFinishedDelete = () => {
+        const { id } = form;
+        deleteUser(id);
+        handleCloseDelete();
+        notify("Delete Success", ETypeStatus.SUCCESS);
     };
     const handleClickDeleteModal = (id) => {
         let findItem = user.find((item) => {
@@ -79,9 +143,7 @@ const Dashboard = () => {
         setShowDeleteModal(true);
     }
     const onSubmit = (userAdd) => {
-        userAdd.id = user.length + 1;
-        const newUsers = [...user, userAdd];
-        setUser(newUsers);
+        addUser(userAdd);
     };
 
     return (
@@ -93,8 +155,12 @@ const Dashboard = () => {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>User Name</th>
-                        <th>Full Name</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Telephone</th>
+                        <th>Address</th>
+                        <th>Avatar</th>
+                        <th>Description</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -105,13 +171,28 @@ const Dashboard = () => {
 
             <ModalComponent title={"Edit"} colorBtn={"success"} nameBtn={"Update"} handleClose={handleClose} show={show} onFinished={onFinished}>
                 <Form.Group className="mb-3">
-                    <Form.Label>User Name</Form.Label>
-                    <Form.Control type="text" placeholder="Enter user name" name="name" onChange={handleChange} value={form.name} />
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control type="text" placeholder="Enter name" name="name" onChange={handleChange} value={form.name} />
                 </Form.Group>
-
                 <Form.Group className="mb-3">
-                    <Form.Label>Full Name</Form.Label>
-                    <Form.Control type="text" placeholder="Enter full name" name="fullName" onChange={handleChange} value={form.fullName} />
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control type="text" placeholder="Enter email" name="email" onChange={handleChange} value={form.email} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Telephone</Form.Label>
+                    <Form.Control type="text" placeholder="Enter telephone" name="tel" onChange={handleChange} value={form.tel} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Address</Form.Label>
+                    <Form.Control type="text" placeholder="Enter address" name="address" onChange={handleChange} value={form.address} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Avatar</Form.Label>
+                    <Form.Control type="text" placeholder="Enter avatar" name="avatar" onChange={handleChange} value={form.avatar} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control type="text" placeholder="Enter description" name="description" onChange={handleChange} value={form.description} />
                 </Form.Group>
             </ModalComponent>
 
